@@ -20,7 +20,12 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('api.urls')),  # Include the API URLs from the 'api' app
+    path('api/', include('api.urls')),
+    path('api/contract/', include('contract.urls')),
+    path('api/notification/', include('notification.urls')),
+    path('api/assets/', include('assets.urls')),
+    path('api/logs/', include('auditLog.urls')),
+    path('api/payments/', include('payment.urls')),
     
     # Swagger UI documentation
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='swagger-ui'),

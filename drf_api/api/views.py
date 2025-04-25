@@ -90,6 +90,7 @@ class UserLoginView(APIView):
                 {
                     "refresh": str(refresh),
                     "access": str(refresh.access_token),
+                    
                 }
             )
         return Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)

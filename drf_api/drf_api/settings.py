@@ -11,11 +11,13 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-
+from dotenv import load_dotenv
 import environ
 import os
+load_dotenv()
 
-
+STRIPE_TEST_API_KEY = os.getenv('STRIPE_TEST_API_KEY')
+STRIPE_TEST_SECRET_KEY = os.getenv('STRIPE_TEST_SECRET_KEY')
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 env = environ.Env()
@@ -54,6 +56,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     #the apps
     'api',
+    'contract',
+    'payment',
+    'notification',
+    'assets',
+    'auditLog',
     #third part
     'rest_framework',
     "rest_framework_simplejwt",
@@ -85,6 +92,9 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
+     'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
 }
 
 TEMPLATES = [
@@ -131,6 +141,9 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+# settings.py
+
 
 
 # Internationalization

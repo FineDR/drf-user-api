@@ -3,13 +3,13 @@ from django.db import models
 
 class UserTBManager(BaseUserManager):
  
-    def create_user(self, email: str, password: str = None, **extra_fields) -> "UserTB":
+    def create_user(self, email: str, password: str = None,**extra_fields) -> "UserTB":
    
         if not email:
             raise ValueError("Email is required")
         email = self.normalize_email(email)
-        extra_fields.setdefault("is_active", False) 
-        user = self.model(email=email, **extra_fields)
+        extra_fields.setdefault("is_active", True) 
+        user = self.model(email=email,**extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -30,10 +30,14 @@ class UserTB(AbstractBaseUser, PermissionsMixin):
    
     email = models.EmailField(unique=True, verbose_name="Email Address")
     phone_number = models.CharField(max_length=15, blank=True, null=True, verbose_name="Phone Number")
-
+    first_name = models.CharField(max_length=100, blank=True, null=True)
+    middle_name = models.CharField(max_length=100, blank=True, null=True)
+    last_name = models.CharField(max_length=100, blank=True, null=True)
+    role = models.CharField(max_length=50, choices=[('Boss', 'Boss'), ('Rider', 'Rider')])
     is_active = models.BooleanField(default=False)  
     is_staff = models.BooleanField(default=False)  
     is_superuser = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     USERNAME_FIELD = "email" 
 

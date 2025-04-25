@@ -6,7 +6,7 @@ from django.contrib.auth.password_validation import validate_password
 class UserTBSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserTB
-        fields = ["email", "phone_number", "password"]
+        fields = ["email", "phone_number","first_name","middle_name","last_name","role" ,'created_at',"password"]
         extra_kwargs = {"password": {"write_only": True}}
 
     def create(self, validated_data):
@@ -34,7 +34,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserTB
-        fields = ["email", "phone_number", "is_active"]
+        fields = ["email", "phone_number","first_name","middle_name","last_name","role" ,"is_active"]
         read_only_fields = ["email", "is_active"]
 
 
