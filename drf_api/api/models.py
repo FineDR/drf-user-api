@@ -33,7 +33,7 @@ class UserTB(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=100, blank=True, null=True)
     middle_name = models.CharField(max_length=100, blank=True, null=True)
     last_name = models.CharField(max_length=100, blank=True, null=True)
-    role = models.CharField(max_length=50, choices=[('Boss', 'Boss'), ('Rider', 'Rider')])
+    role = models.CharField(max_length=50, choices=[('seller', 'seller'), ('buyer', 'buyer')])
     is_active = models.BooleanField(default=False)  
     is_staff = models.BooleanField(default=False)  
     is_superuser = models.BooleanField(default=False)
@@ -42,6 +42,10 @@ class UserTB(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = "email" 
 
     objects = UserTBManager()
+
+    class Meta:
+        verbose_name = "User"
+        verbose_name_plural = "Users"
 
     def __str__(self) -> str:
         return self.email

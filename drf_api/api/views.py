@@ -10,12 +10,27 @@ from .models import UserTB
 from .serializers import UserTBSerializer, LoginSerializer, UserProfileSerializer
 import jwt
 from django.conf import settings
+from rest_framework import status, permissions
+from drf_spectacular.utils import extend_schema
+from django.http import JsonResponse
+from django.contrib.auth import get_user_model
 
+import subprocess
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 class RegisterView(APIView):
-    """
-    API for user registration and sending email verification link.
-    """
     permission_classes = [AllowAny]
+    """
+    API for user registration.
+    """
+    @extend_schema(
+        request=UserTBSerializer,
+        responses={200: None},
+        summary="Register a new user",
+        description="Takes email and password to create a new user."
+    )
+
+   
 
     def post(self, request):
         serializer = UserTBSerializer(data=request.data)
@@ -90,10 +105,25 @@ class UserLoginView(APIView):
                 {
                     "refresh": str(refresh),
                     "access": str(refresh.access_token),
+                    "email": user.email,
                     
                 }
             )
         return Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)
+
+
+class LogoutView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        try:
+            refresh_token = request.data.get("refresh")
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+            return Response({"detail": "Logout successful."}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"detail": "Invalid token."}, status=status.HTTP_400_BAD_REQUEST)
+
 
 class UserProfileView(APIView):
     """
@@ -111,3 +141,34 @@ class UserProfileView(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+def run_create_superuser(request):
+    User = get_user_model()
+    email = "admin@gmail.com"
+    password = "admin12345"
+
+    if not User.objects.filter(email=email).exists():
+        User.objects.create_superuser(
+            email=email,
+            password=password,
+            first_name="Super",
+            last_name="Admin",
+            middle_name="System",
+            phone_number="1234567890",
+            role="seller",  # or any role you support
+            is_active=True,
+        )
+        return JsonResponse({"message": "✅ Superuser created successfully."})
+    else:
+        return JsonResponse({"message": "⚠️ Superuser already exists."})
+    
+
+
+@csrf_exempt
+def run_migrations(request):
+    try:
+        result = subprocess.run(["python", "manage.py", "migrate"], check=True, capture_output=True, text=True)
+        return JsonResponse({"message": "✅ Migrations applied", "output": result.stdout})
+    except subprocess.CalledProcessError as e:
+        return JsonResponse({"error": "❌ Migration failed", "details": e.stderr}, status=500)

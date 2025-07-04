@@ -41,32 +41,55 @@ SECRET_KEY = 'django-insecure-yybn)qhjzq#c7qm4r_!!$(v0&(&jb&g@9*f&485&#s6*x940-p
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'backend-kcxn.onrender.com', 
+    'localhost',                 
+    '127.0.0.1',                  
+]
 
-FRONTEND_URL = 'http://localhost:3000'  # Or the actual URL of your frontend
+FRONTEND_URL = "http://localhost:5173"
+CSRF_TRUSTED_ORIGINS = [
+    "https://backend-kcxn.onrender.com"
+]
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
 
 # Application definition
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "https://unique-semifreddo-0f060b.netlify.app",
+]
 
 INSTALLED_APPS = [
+    # Grappelli must come first!
+    'grappelli',
+    'grappelli.dashboard',
+
+    # Django default apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    #the apps
+
+    # Your apps
     'api',
-    'contract',
-    'payment',
-    'notification',
-    'assets',
-    'auditLog',
-    #third part
+    'category',
+    'product',
+    'message',
+    'motocycleImage',
+    'conversation',
+
+    # Third-party apps
     'rest_framework',
     "rest_framework_simplejwt",
     "corsheaders",
     'drf_yasg',
+    'drf_spectacular',
+    'smsparser',
 ]
+
 
 MIDDLEWARE = [
      "corsheaders.middleware.CorsMiddleware",
@@ -86,21 +109,47 @@ DATABASES = {
 AUTH_USER_MODEL = "api.UserTB"
 ROOT_URLCONF = 'drf_api.urls'
 
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
 
 REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
-    ),
-     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
     ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'It Is Possible API',
+    'DESCRIPTION': 'Comprehensive API documentation for It Is Possible.',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # Optional: 
+    'COMPONENT_SPLIT_REQUEST': True,
+    'SCHEMA_PATH_PREFIX_TRIM': True,
+
+  
+}
+
+# TEMPLATES = [
+#     {
+#         'BACKEND': 'django.template.backends.django.DjangoTemplates',
+#         'DIRS': [],
+#         'APP_DIRS': True,
+#         'OPTIONS': {
+#             'context_processors': [
+#                 'django.template.context_processors.debug',
+#                 'django.template.context_processors.request',
+#                 'django.contrib.auth.context_processors.auth',
+#                 'django.contrib.messages.context_processors.messages',
+#             ],
+#         },
+#     },
+# ]
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -113,9 +162,11 @@ TEMPLATES = [
     },
 ]
 
+
+
 WSGI_APPLICATION = 'drf_api.wsgi.application'
-
-
+GRAPPELLI_INDEX_DASHBOARD = 'api.dashboard.CustomIndexDashboard'
+GRAPPELLI_ADMIN_TITLE = "It Is Possible Admin Dashboard"
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
@@ -162,7 +213,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
-
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
